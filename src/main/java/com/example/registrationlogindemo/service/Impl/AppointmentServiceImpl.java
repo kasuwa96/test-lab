@@ -20,8 +20,10 @@ import java.util.List;
 @Service
 public class AppointmentServiceImpl implements AppointmentService {
 
+
     @Autowired
     private AppointmentRepository appointmentRepository;
+
     @Override
     public void makeAppointment(AppointmentDto appointmentDto, Long patientId, String patientEmail) {
         Appointment appointment = new Appointment();
@@ -32,9 +34,12 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointment.setPatientEmail(patientEmail);
         appointment.setStatus(appointmentDto.getStatus()); // Set status to "pending"
         appointment.setReport(appointmentDto.getReport());
-        System.out.println("appointment"+appointment);
+        System.out.println("appointment" + appointment);
         appointmentRepository.save(appointment);
+
     }
+
+
 
     @Override
     public List<Appointment> getAppointmentsByUserId(Integer patientId) {
@@ -114,4 +119,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     public void cancelAppointment(int id) {
         appointmentRepository.deleteById((long) Long.valueOf(id));
     }
-}
+
+
+    }
+
