@@ -92,6 +92,25 @@
       </table>
     </div>
 
+    <div class="container mt-5">
+      <div id="inquiry-details">
+        <h2>Inquiry Details</h2>
+        <table class="table">
+          <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Message</th>
+          </tr>
+          </thead>
+          <tbody id="inquiry-table-body">
+          <!-- Appointment details will be dynamically added here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
     <hr>
 
    
@@ -107,6 +126,8 @@
       // Load users when the page loads
        loadUsers();
        loadAppointments();
+       loadInquiries();
+       
 
       // Function to load users
      function loadUsers() {
@@ -126,6 +147,26 @@
           console.error("Error loading users:", error);
         });
       }
+      
+      function loadInquiries() {
+        $.get("/inquiry", function(data) {
+         console.log("Inquiry data fetched successfully:", data);
+          $("#inquiry-table-body").empty();
+          data.forEach(function(inquiry) {
+            $("#inquiry-table-body").append(
+              "<tr>" +
+              "<td>" + inquiry.id + "</td>" +
+              "<td>" + inquiry.name + "</td>" +
+              "<td>" + inquiry.email + "</td>" +
+              "<td>" + inquiry.message + "</td>" +
+              "</tr>"
+            );
+          });
+        }).fail(function(xhr, status, error) {
+          console.error("Error loading users:", error);
+        });
+      }
+
 
        function loadAppointments() {
         $.get("/api/appointments", function(data) {

@@ -26,12 +26,6 @@ public class UserController {
         return new ResponseEntity<>(UserDto.fromUser(user), HttpStatus.CREATED);
     }
 
-//    @GetMapping("/getusers")
-//    public ResponseEntity<List<UserDto>> getAllUsers() {
-//        List<User> userList = userService.getAllUsers();
-//        List<UserDto> userDtoList = UserDto.fromUserList(userList);
-//        return new ResponseEntity<>(userDtoList, HttpStatus.OK);
-//    }
 
     @GetMapping("/getusers")
     public ResponseEntity<List<User>> getAllAppointments() {

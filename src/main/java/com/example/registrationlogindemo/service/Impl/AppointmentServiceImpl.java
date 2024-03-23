@@ -4,6 +4,7 @@ import com.example.registrationlogindemo.dto.AppointmentDto;
 import com.example.registrationlogindemo.entity.Appointment;
 import com.example.registrationlogindemo.repository.AppointmentRepository;
 import com.example.registrationlogindemo.service.AppointmentService;
+import com.example.registrationlogindemo.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,8 +22,13 @@ import java.util.List;
 public class AppointmentServiceImpl implements AppointmentService {
 
 
-    @Autowired
-    private AppointmentRepository appointmentRepository;
+    private final AppointmentRepository appointmentRepository;
+    private final EmailService emailService;
+
+    public AppointmentServiceImpl(AppointmentRepository appointmentRepository, EmailService emailService) {
+        this.appointmentRepository = appointmentRepository;
+        this.emailService = emailService;
+    }
 
     @Override
     public void makeAppointment(AppointmentDto appointmentDto, Long patientId, String patientEmail) {
@@ -32,16 +38,35 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointment.setTestType(appointmentDto.getTestType());
         appointment.setPatientId(Math.toIntExact(patientId));
         appointment.setPatientEmail(patientEmail);
-        appointment.setStatus(appointmentDto.getStatus()); // Set status to "pending"
+        appointment.setStatus(appointmentDto.getStatus());
         appointment.setReport(appointmentDto.getReport());
         System.out.println("appointment" + appointment);
         appointmentRepository.save(appointment);
 
+
+        String laboratoryName = "ABC Laboratory";
+        String laboratoryEmail = "abclab@example.com";
+        String laboratoryPhoneNumber = "077 123 4567";
+
+        String to = patientEmail;
+        String subject = "Appointment Details from " + laboratoryName;
+        String text = "Dear Patient,\n\n" +
+                "Thank you for choosing " + laboratoryName + " for your appointment. Here are the details:\n\n" +
+                "Patient ID: " + appointment.getPatientId() + "\n" +
+                "Appointment ID: " + appointment.getAppointmentId() + "\n" +
+                "Appointment Date: " + appointment.getAppointmentDate() + "\n" +
+                "Appointment Time: " + appointment.getAppointmentTime() + "\n" +
+                "Test Type: " + appointment.getTestType() + "\n\n" +
+                "Please feel free to contact us if you have any questions or need further assistance.\n\n" +
+                "Sincerely,\n" +
+                laboratoryName + " Laboratory\n" +
+                laboratoryEmail + "\n" +
+                laboratoryPhoneNumber;
+
+        emailService.sendAppointmentDetailsEmail(to, subject, text);
     }
 
-
-
-    @Override
+        @Override
     public List<Appointment> getAppointmentsByUserId(Integer patientId) {
         return appointmentRepository.findByPatientId(patientId);
     }
@@ -117,7 +142,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     public void cancelAppointment(int id) {
-        appointmentRepository.deleteById((long) Long.valueOf(id));
+        appointmentRepository.deleteById(Long.valueOf(id));
     }
 
 

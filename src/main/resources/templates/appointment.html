@@ -73,15 +73,24 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <!-- Appointment Script -->
     <script>
-        // JavaScript code to handle form submission and send POST request to backend
-        document.getElementById("appointmentForm").addEventListener("submit", function(event) {
+        // Function to handle form submission
+        function handleFormSubmission(event) {
             event.preventDefault();
+
+            // Get form data
             var formData = {
                 appointmentDate: document.getElementById("appointmentDate").value,
                 appointmentTime: document.getElementById("appointmentTime").value,
                 testType: document.getElementById("testType").value
-
             };
+
+            // Perform validation
+            if (!validateAppointment(formData)) {
+                
+                return;
+            }
+
+            // Send POST request to backend
             fetch('/make', {
                 method: 'POST',
                 headers: {
@@ -89,22 +98,52 @@
                 },
                 body: JSON.stringify(formData)
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Failed to create appointment');
-                }
-                return response.text();
-            })
-            .then(data => {
-                alert(data);
-                // Optionally, you can redirect the user to another page or refresh the current page
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Failed to create appointment');
-            });
-        });
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to create appointment');
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    alert(data);
+                    // Optionally, you can redirect the user to another page or refresh the current page
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to create appointment');
+                });
+        }
+
+        // Function to validate appointment details
+        function validateAppointment(formData) {
+            // Get current date and time
+            var currentDate = new Date();
+            var currentHour = currentDate.getHours();
+
+            // Validate if the selected date is today or future date
+            var selectedDate = new Date(formData.appointmentDate);
+            if (selectedDate <= currentDate) {
+                alert("Please select a future date.");
+                return false;
+            }
+
+            // Validate if the selected time is between 8:00 AM and 8:00 PM
+            var selectedTime = formData.appointmentTime.split(':');
+            var selectedHour = parseInt(selectedTime[0]);
+            if (selectedHour < 8 || selectedHour >= 20) {
+                alert("Appointments can only be scheduled between 8:00 AM and 8:00 PM.");
+                return false;
+            }
+
+            return true; // All validations passed
+        }
+
+
+        // Add event listener to form
+        document.getElementById("appointmentForm").addEventListener("submit", handleFormSubmission);
     </script>
+
+
 
 
 </body>
